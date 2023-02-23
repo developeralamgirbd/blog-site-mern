@@ -17,14 +17,6 @@ const postSchema = new Schema({
             required: [true, 'Description is required']
         },
 
-        status: {
-            type: String,
-            enum:{
-                values: ['published', 'pending', 'draft'],
-                message: '{VALUE} is not accepted, please provide published, pending and draft'
-            },
-            default: 'published'
-        },
         categoryID: {
             type: Schema.Types.ObjectId,
             ref: 'Category',

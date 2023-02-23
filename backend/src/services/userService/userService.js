@@ -1,7 +1,10 @@
 const User = require('../../models/userModel');
 
 exports.registerService = async(userData)=>{
-	return await User.create(userData);
+
+	const user = new User(userData);
+	await user.save();
+	return user;
 };
 
 exports.userDetailsService = async (email)=>{
@@ -14,7 +17,6 @@ exports.userDetailsService = async (email)=>{
 
 
 exports.userFindByEmailService = async (email)=>{
-
 	return await User.aggregate(  [
 		{$match: {email } }
 	] );
@@ -33,10 +35,10 @@ exports.passwordUpdateService = async (email, hashPassword)=>{
 	return user;
 }
 
-exports.userProfileUpdateService = async (_id, Request)=>{
+exports.userProfileUpdateService = async (_id, firstName, lastName)=>{
 	 const user = await User.updateOne({_id}, {$set: {
-			 firstName: Request.firstName,
-			 lastName: Request.lastName,
+			 firstName,
+			 lastName,
 		 }}, {runValidators: true});
 	return user;
 }

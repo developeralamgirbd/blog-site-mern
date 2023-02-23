@@ -29,17 +29,6 @@ const userSchema = mongoose.Schema({
 		lowercase: true,
 
 	},
-
-	phone: {
-		type: String,
-		required: [true, 'Mobile number is required'],
-		unique: true,
-		validate: {
-			validator: (value)=>
-				validator.isMobilePhone(value, ['bn-BD']),
-			message: 'Please provide a valid phone number, only BD mobile number support'
-		}
-	},
 	password: {
 		type: String,
 		required: [true, 'Password is required'],
@@ -70,12 +59,6 @@ const userSchema = mongoose.Schema({
 		enum: ['active', 'inactive', 'blocked'],
 		default: 'active'
 	},
-	confirmationToken: String,
-	confirmationTokenExpire: Date,
-
-	passwordChangedAt: Date,
-	passwordResetToken: String,
-	passwordResetExpires: Date,
 
 	verified: {
 		type: Boolean,
@@ -94,20 +77,6 @@ userSchema.pre('save', function(next){
 	this.confirmPassword = undefined;
 	next();
 });
-
-
-userSchema.methods.generateConfirmationToken = function(){
-	const token = crypto.randomBytes(32).toString('hex');
-
-	this.confirmationToken = token;
-
-	let date = new Date();
-	date.setMinutes( date.getMinutes() + 5);
-	this.confirmationTokenExpire = date;
-	return token;
-};
-
-
 
 
 userSchema.methods.comparePassword = function(password, hash){

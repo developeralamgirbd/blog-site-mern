@@ -2,18 +2,29 @@ const CategoryModel = require('../models/categoryModel');
 const PostModel = require('../models/postModel');
 const mongoose = require('mongoose');
 
-const {createService } = require("../services/common/createService");
 const {checkAssociateService} = require("../services/common/checkAssociateService");
-const {deleteService} = require("../services/common/deleteService");
-const {updateService} = require("../services/common/updateService");
 
-const {showCategoryService, categoryFindByName, categoryFindByID} = require("../services/categoryService/categoryService");
+const {showCategoriesService,
+    categoryFindByName,
+    categoryFindByID,
+    categoryUpdateService,
+    categoryCreateService,
+    categoryDeleteService} = require("../services/categoryService/categoryService");
 
 exports.create = async (req, res)=>{
     try {
+        const {name} = req.body;
 
-        const category = await createService(req.body, CategoryModel);
+       const findCategory = await categoryFindByName(name.toLowerCase());
 
+       if (findCategory[0]){
+          return res.status(400).json({
+               status: 'fail',
+               error: 'Category already created',
+           });
+       }
+
+        const category = await categoryCreateService(name);
         res.status(200).json({
             status: 'success',
             message: 'Successfully created category',
@@ -24,7 +35,7 @@ exports.create = async (req, res)=>{
         console.log(error);
         res.status(500).json({
             status: 'fail',
-            error: error.message
+            error: 'Server error occurred'
         });
     }
 
@@ -33,8 +44,8 @@ exports.create = async (req, res)=>{
 exports.showCategory = async (req, res)=>{
     try {
 
-        const categories = await showCategoryService();
-        // categories[0].totalCategory[0].count === 0
+        const categories = await showCategoriesService();
+
         if (!categories[0]){
            return res.status(400).json({
                 status: 'fail',
@@ -44,8 +55,7 @@ exports.showCategory = async (req, res)=>{
 
         res.status(200).json({
             status: 'success',
-            message: 'Successfully get all category',
-            data: categories[0]
+            data: categories
         });
     }catch (error) {
         console.log(error);
@@ -56,11 +66,38 @@ exports.showCategory = async (req, res)=>{
     }
 }
 
+exports.getSingleCategory = async (req, res)=>{
+    try {
+        const catID = req.params.categoryID;
+
+        const category = await categoryFindByID(catID);
+
+        if (!category[0]){
+           return res.status(400).json({
+                status: 'fail',
+                message: 'Category not found',
+            });
+        }
+
+        res.status(200).json({
+            status: 'success',
+            message: 'Successfully get all category',
+            data: category[0]
+        });
+    }catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 'fail',
+            error: 'Server error occurred'
+        });
+    }
+}
+
 exports.updateCategory = async (req, res)=>{
     try {
 
-        const _id = req.body._id;
-        const categoryName = req.body.name;
+        const _id = req.params.categoryID;
+        const categoryName = req.body.categoryName;
 
         if (categoryName === ''){
             return res.status(400).json({
@@ -69,9 +106,9 @@ exports.updateCategory = async (req, res)=>{
             });
         }
 
-        const result = await updateService({_id}, {$set: {name: categoryName}}, CategoryModel);
+        const result = await categoryUpdateService(_id, categoryName)
 
-        if (result.modifiedCount === 0){
+        if (!result){
             return res.status(400).json({
                 status: 'fail',
                 error: 'Category not update'
@@ -80,7 +117,6 @@ exports.updateCategory = async (req, res)=>{
 
         res.status(200).json({
             status: 'success',
-            message: 'Category update successfully',
             result
         });
 
@@ -88,14 +124,14 @@ exports.updateCategory = async (req, res)=>{
         console.log(error)
         res.status(500).json({
             status: 'fail',
-            error: error.message
+            error: 'Server error occurred'
         });
     }
 }
 
 exports.deleteCategory = async (req, res)=>{
     try {
-        const _id = req.body._id;
+        const _id = req.params.categoryID;
 
         const ObjectId = mongoose.Types.ObjectId;
 
@@ -117,11 +153,10 @@ exports.deleteCategory = async (req, res)=>{
             });
         }
 
-        const result = await deleteService({_id: ObjectId(_id)}, CategoryModel);
+        const result = await categoryDeleteService(_id);
 
         res.status(200).json({
             status: 'success',
-            message: 'Category delete successfully',
             data: result
         });
 

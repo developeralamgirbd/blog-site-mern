@@ -32,7 +32,7 @@ mongoose
 		
 		
 // Router
-readdirSync('./src/routes').map(r => app.use('/api/v1', require(`./backend/src/routes/${r}`)));
+readdirSync('./src/routes').map(r => app.use('/api/v1', require(`./src/routes/${r}`)));
 
 // Server Listen
 const port = process.env.PORT || 8000;

@@ -2,8 +2,14 @@ const mongoose = require("mongoose");
 const Post = require("../../models/postModel");
 const ObjectId = mongoose.Types.ObjectId;
 
+exports.postCreateService = async (postBody)=>{
+	const category = new Post(postBody);
+	await category.save();
+	return category;
+}
+
 exports.showAllPostService = async (authorID)=>{
-	return await Post.aggregate([
+	return Post.aggregate([
 		{$match: { authorID: ObjectId(authorID)}},
 
 		{$lookup: {
@@ -46,12 +52,11 @@ exports.showAllPostService = async (authorID)=>{
 	])
 }
 
-exports.showPostByCategoryService = async (categoryID)=>{
-	return await Post.aggregate([
+exports.showPostByCategoryService = async (query)=>{
+
+	return Post.aggregate([
 		{
-			$match: {
-				categoryID: ObjectId(categoryID)
-			}
+			$match: query
 		},
 
 		{$lookup: {
@@ -92,9 +97,12 @@ exports.showPostByCategoryService = async (categoryID)=>{
 	]);
 }
 
-exports.showPostByStatusService = async (authorID, status)=>{
-	return await Post.aggregate([
-		{$match: { authorID: ObjectId(authorID), status }},
+exports.searchPostService = async (searchQuery)=>{
+
+
+
+	 return Post.aggregate([
+		{$match: searchQuery},
 
 		{$lookup: {
 				from: 'users',
@@ -135,9 +143,10 @@ exports.showPostByStatusService = async (authorID, status)=>{
 	]);
 }
 
-exports.searchPostService = async (authorID, search)=>{
-	return await Post.aggregate([
-		{$match: { authorID: ObjectId(authorID), title: {$regex: search, $options: "i" }}},
+exports.postByID = async (_id)=>{
+
+	return Post.aggregate([
+		{$match: { _id: ObjectId(_id)}},
 
 		{$lookup: {
 				from: 'users',
@@ -163,6 +172,7 @@ exports.searchPostService = async (authorID, search)=>{
 						}},
 
 					{$project: {
+							_id: 1,
 							title: 1,
 							description: 1,
 							status:1,
@@ -170,10 +180,19 @@ exports.searchPostService = async (authorID, search)=>{
 							updateDate: "$updatedAt",
 							authorName: {$concat: ["$authorInfo.firstName", " ", '$authorInfo.lastName'] },
 							categoryName: {$first: "$categoryInfo.name"},
-
 						}
 					}
 				]
 			}},
-	]);
+
+	])
 }
+
+exports.postUpdateService = async (_id, authorID, updateBody)=>{
+	return Post.updateOne({_id, authorID}, updateBody, {runValidators: true});
+}
+
+exports.postDeleteService = async (_id)=>{
+	return Post.findByIdAndDelete(_id);
+}
+

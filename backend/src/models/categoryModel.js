@@ -8,17 +8,6 @@ const categorySchema = new Schema({
         trim: true,
         lowercase: true,
         unique: [true, 'Category already exit']
-    },
-    postsID: [
-        {
-            type: Schema.Types.ObjectId,
-            ref: 'Post',
-        }
-    ],
-    status: {
-        type: String,
-        enum: ['active', 'inactive'],
-        default: 'active'
     }
 
 }, {versionKey: false, timestamps: true});

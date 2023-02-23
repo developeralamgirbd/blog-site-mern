@@ -1,21 +1,29 @@
-
 const mongoose = require("mongoose");
 const PostModel = require('../models/postModel');
 const CategoryModel = require('../models/categoryModel');
 
 const {categoryFindByID, categoryFindByName} = require("../services/categoryService/categoryService");
 
-const {createService} = require("../services/common/createService");
-const {updateService} = require("../services/common/updateService");
-const {showAllPostService, showPostByStatusService,searchPostService,showPostByCategoryService} = require('../services/postService/postService');
 const {deleteService} = require("../services/common/deleteService");
 const {checkAssociateService} = require("../services/common/checkAssociateService");
+
+const {updateService} = require("../services/common/updateService");
+
+const {
+    showAllPostService,
+    postCreateService,
+    searchPostService,
+    showPostByCategoryService,
+    postUpdateService,
+    postDeleteService, postByID
+}
+    = require('../services/postService/postService');
 
 
 exports.create = async (req, res)=>{
     try {
 
-        const categoryID = req.body.categoryID;
+        const {title, description, categoryID, } = req.body;
 
         const isCategory = await categoryFindByID(categoryID);
 
@@ -26,19 +34,12 @@ exports.create = async (req, res)=>{
             });
         }
 
-        const createObj = {...req.body};
-        createObj.authorID = req.auth._id;
+        const postBody = {title, description, categoryID, authorID: req.auth._id};
 
-        const post = await createService(createObj, PostModel);
-
-
-        await updateService({_id: post.categoryID},{$push: {
-                postsID: post._id
-            }},CategoryModel )
+        const post = await postCreateService(postBody);
 
         res.status(200).json({
             status: 'success',
-            message: 'Successfully create successfully',
             data: post
         });
 
@@ -82,19 +83,10 @@ exports.showAllPost = async (req, res)=>{
 
 exports.updatePost = async (req, res)=>{
     try {
+        const _id = req.params.id;
         const authorID = req.auth._id;
-        const categoryID = req.body.categoryID;
-        const _id = req.body._id;
+        const {title, description, categoryID} = req.body;
 
-        if (categoryID === ''){
-            return res.status(400).json({
-                status: 'fail',
-                message: 'Category is required'
-            });
-        }
-
-        const ObjectId = mongoose.Types.ObjectId;
-        // Check whether the request category id is in the category collection
         const isCategory = await categoryFindByID(categoryID);
 
         if (!isCategory[0]){
@@ -104,64 +96,88 @@ exports.updatePost = async (req, res)=>{
             });
         }
 
-        // get category id from post
-        const oldCategoryID = await PostModel.aggregate([
-            {$match: {_id: ObjectId(_id) }},
-            {$project: {_id: 0, categoryID: 1}}
-        ]);
+        const findPost = await postByID(_id);
 
-        const isOldCatID = oldCategoryID[0] ? oldCategoryID[0]['categoryID'] : 'alamgir12345'
+        if (!findPost[0]){
+            return res.status(400).json({
+                status: 'fail',
+                message: 'Post not found'
+            });
+        }
 
-        // post id remove from previous category
-        await updateService({_id: ObjectId(isOldCatID)}, {$pull: {
-                'postsID': _id
-            }}, CategoryModel);
-
-
-        const updateObj = {...req.body};
-        // delete post id from request body
-        delete updateObj._id;
+        const updateBody = {
+            title: title !== '' ? title : findPost[0].title,
+            description: description !== '' ? description : findPost[0].description,
+            categoryID: categoryID !== '' ? categoryID : findPost[0].categoryID
+        };
 
         // only update logged user post, not allow other person post update
-        const result = await updateService({_id: ObjectId(_id), authorID: ObjectId(authorID)}, updateObj, PostModel );
+        const data = await postUpdateService(_id, authorID, updateBody);
 
-        if (result.modifiedCount === 0){
+        if (!data){
             return res.status(400).json({
                 status: 'fail',
                 message: 'Post not updated'
             });
         }
 
-        // if post category change, push post id in category collection
-        await updateService({_id: isCategory[0]['_id']},{$addToSet: {
-                postsID: _id
-            }},CategoryModel );
-
-
         res.status(200).json({
             status: 'success',
-            message: 'Post update successfully',
-            result
+            data
         });
 
     }catch (error) {
         console.log(error);
         res.status(500).json({
             status: 'fail',
-            error: error.message
+            error: 'Server error occurred'
         });
     }
 }
 
-exports.showPostByStatus = async (req, res)=>{
+exports.authSearchPosts = async (req, res)=>{
     try {
 
         const authorID = req.auth._id;
-        const status = req.params.status;
+        const keyword = req.params.keyword;
 
-        const result = await showPostByStatusService(authorID, status);
+        const ObjectId = mongoose.Types.ObjectId;
 
-        if (!result[0]['posts'][0]){
+        const searchQuery = { authorID: ObjectId(authorID), title: {"$regex": keyword, "$options": "i" }};
+
+        const posts = await searchPostService(searchQuery)
+
+        if (!posts[0]){
+            return res.status(404).json({
+                status: 'fail',
+                message: 'Post not found'
+            });
+        }
+
+        res.status(200).json({
+            status: 'Success',
+            data: posts
+        })
+
+    }catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 'fail',
+            error: 'Server error occurred'
+        });
+    }
+}
+
+exports.searchPosts = async (req, res)=>{
+    try {
+
+        const keyword = req.params.keyword;
+
+        const searchQuery = { title: {$regex: keyword, $options: "i" }};
+
+        const posts = await searchPostService(searchQuery)
+
+        if (posts[0].posts.length === 0){
             return res.status(400).json({
                 status: 'fail',
                 message: 'Post not found'
@@ -170,8 +186,7 @@ exports.showPostByStatus = async (req, res)=>{
 
         res.status(200).json({
             status: 'Success',
-            message: 'Post Select by date successfully',
-            date: result
+            data: posts
         })
 
     }catch (error) {
@@ -183,15 +198,26 @@ exports.showPostByStatus = async (req, res)=>{
     }
 }
 
-exports.searchPost = async (req, res)=>{
+exports.authShowPostByCategory = async (req, res)=>{
     try {
 
+        const categoryName =  req.params.name.toLowerCase();
         const authorID = req.auth._id;
-        const search = req.params.search;
 
-        const post = await searchPostService(authorID, search)
+        const isCategory = await categoryFindByName(categoryName);
 
-        if (post.length === 0){
+        if (!isCategory[0]){
+            return res.status(400).json({
+                status: 'fail',
+                message: 'Category not found'
+            });
+        }
+        const ObjectId = mongoose.Types.ObjectId;
+        const query = {authorID: ObjectId(authorID), categoryID: ObjectId(isCategory[0]['_id'])}
+
+        const post = await showPostByCategoryService(query);
+
+        if (!post[0].posts[0]){
             return res.status(400).json({
                 status: 'fail',
                 message: 'Post not found'
@@ -200,8 +226,8 @@ exports.searchPost = async (req, res)=>{
 
         res.status(200).json({
             status: 'Success',
-            message: `Post search by ${search}`,
-            date: post
+            message: `Post show by ${categoryName} category successfully`,
+            data: post
         })
 
     }catch (error) {
@@ -226,10 +252,12 @@ exports.showPostByCategory = async (req, res)=>{
                 message: 'Category not found'
             });
         }
+        const ObjectId = mongoose.Types.ObjectId;
+        const query = {categoryID: ObjectId(isCategory[0]['_id'])}
 
-        const post = await showPostByCategoryService(isCategory[0]['_id']);
+        const post = await showPostByCategoryService(query);
 
-        if (post[0].posts.length === 0){
+        if (!post[0].posts[0]){
             return res.status(400).json({
                 status: 'fail',
                 message: 'Post not found'
@@ -251,29 +279,48 @@ exports.showPostByCategory = async (req, res)=>{
     }
 }
 
-exports.deletePost = async (req, res)=>{
+exports.showSinglePost = async (req, res)=>{
     try {
-        const _id = req.body._id;
-        const result = await deleteService({_id}, PostModel);
 
-        if(result.deletedCount === 0){
-           return res.status(400).json({
+        const _id =  req.params.id;
+
+        const post = await postByID(_id);
+
+        if (!post[0]){
+            return res.status(404).json({
                 status: 'fail',
-                message: 'Post not deleted',
+                message: 'Post not found'
             });
         }
 
-        const ObjectId = mongoose.Types.ObjectId;
-        const category = await checkAssociateService({postsID: ObjectId(_id)}, CategoryModel);
+        res.status(200).json({
+            status: 'Success',
+            data: post
+        })
 
-        // post id remove from previous category
-        await updateService({_id: ObjectId(category[0]['_id'])}, {$pull: {
-                'postsID': _id
-            }}, CategoryModel);
+    }catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 'fail',
+            error: error.message
+        });
+    }
+}
+
+exports.deletePost = async (req, res)=>{
+    try {
+        const _id = req.params.id;
+        const result = await postDeleteService(_id);
+
+        if(!result){
+           return res.status(400).json({
+                status: 'fail',
+                message: 'Invalid request',
+            });
+        }
 
         res.status(200).json({
             status: 'success',
-            message: 'Category delete successfully',
             data: result
         });
 
@@ -281,7 +328,7 @@ exports.deletePost = async (req, res)=>{
         console.log(error);
         res.status(500).json({
             status: 'fail',
-            error: error.message
+            error: 'Server error occurred'
         });
     }
 }
