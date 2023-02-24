@@ -5,7 +5,7 @@ const {AuthVerifyMiddleware} = require("../middleware/AuthVerifyMiddleware");
 
 
 router.post('/categories', AuthVerifyMiddleware, create);
-router.get('/categories', AuthVerifyMiddleware, showCategory);
+router.get('/categories', showCategory);
 router.get('/categories/:categoryID', AuthVerifyMiddleware, getSingleCategory);
 router.patch('/categories/:categoryID', AuthVerifyMiddleware, updateCategory);
 router.delete('/categories/:categoryID', AuthVerifyMiddleware, deleteCategory);

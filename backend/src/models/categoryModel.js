@@ -8,6 +8,10 @@ const categorySchema = new Schema({
         trim: true,
         lowercase: true,
         unique: [true, 'Category already exit']
+    },
+    authorID: {
+        type: Schema.Types.ObjectId,
+        ref: 'User'
     }
 
 }, {versionKey: false, timestamps: true});

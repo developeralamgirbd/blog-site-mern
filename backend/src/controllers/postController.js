@@ -15,7 +15,7 @@ const {
     searchPostService,
     showPostByCategoryService,
     postUpdateService,
-    postDeleteService, postByID
+    postDeleteService, postByID, authShowAllPostService
 }
     = require('../services/postService/postService');
 
@@ -53,11 +53,38 @@ exports.create = async (req, res)=>{
 
 };
 
-exports.showAllPost = async (req, res)=>{
+exports.authShowAllPost = async (req, res)=>{
     try {
         const authorID = req.auth._id;
 
-        const post = await showAllPostService(authorID);
+        const post = await authShowAllPostService(authorID);
+
+        if (!post[0]){
+            return res.status(400).json({
+                status: 'fail',
+                message: 'Post not found'
+            });
+        }
+
+        res.status(200).json({
+            status: 'success',
+            message: 'Successfully get all post',
+            data: post[0]
+        });
+
+    }catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 'fail',
+            error: error.message
+        });
+    }
+}
+
+exports.showAllPost = async (req, res)=>{
+    try {
+
+        const post = await showAllPostService();
 
         if (!post[0]){
             return res.status(400).json({
@@ -310,7 +337,8 @@ exports.showSinglePost = async (req, res)=>{
 exports.deletePost = async (req, res)=>{
     try {
         const _id = req.params.id;
-        const result = await postDeleteService(_id);
+        const authorID = req.auth._id;
+        const result = await postDeleteService(authorID, _id);
 
         if(!result){
            return res.status(400).json({

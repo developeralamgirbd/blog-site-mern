@@ -132,6 +132,7 @@ exports.updateCategory = async (req, res)=>{
 exports.deleteCategory = async (req, res)=>{
     try {
         const _id = req.params.categoryID;
+        const authorID = req.auth._id;
 
         const ObjectId = mongoose.Types.ObjectId;
 
@@ -153,7 +154,7 @@ exports.deleteCategory = async (req, res)=>{
             });
         }
 
-        const result = await categoryDeleteService(_id);
+        const result = await categoryDeleteService(authorID, _id);
 
         res.status(200).json({
             status: 'success',
