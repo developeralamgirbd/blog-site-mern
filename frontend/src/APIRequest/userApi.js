@@ -89,8 +89,12 @@ export const resetPasswordRequest = async (email, otp, password, confirmPassword
     try {
 
         const {data} =  await axios.patch(`/users/${email}/${otp}`, {password, confirmPassword});
-        toast.success(data.message)
-        return true
+
+        if (data.data.modifiedCount > 0){
+            toast.success(data.message)
+            return true
+        }
+
     }catch (e) {
         if (e.response.status === 400){
             toast.error(e.response.data.error)

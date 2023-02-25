@@ -193,7 +193,12 @@ exports.login = async (req, res) => {
 	try {
 		const {email, password}  = req.body;
 
+		console.log(email)
+		console.log(password)
+
 		const user = await userFindByEmailService(email);
+
+
 
 		if (!user[0]){
 			return res.status(400).json({
@@ -415,6 +420,7 @@ exports.resetPassword= async (req,res)=>{
 			minSymbols: 1,
 			minLowercase: 1
 		})
+
 		if (!validate){
 			return res.status(400).json({
 				status: 'fail',
@@ -431,7 +437,7 @@ exports.resetPassword= async (req,res)=>{
 
 		const hash = hashPassword(password);
 
-		await passwordUpdateService(req.auth?.email, hash);
+		 const update = await passwordUpdateService(email, hash);
 
 		await OtpModel.updateOne({email: email, otp: OTPCode, status: 1}, {
 			otp: '',
@@ -439,7 +445,8 @@ exports.resetPassword= async (req,res)=>{
 
 		res.status(200).json({
 			status: "success",
-			message: 'Password Reset successfully'
+			message: 'Password Reset successfully',
+			data: update
 		})
 	}
 	catch (err) {
