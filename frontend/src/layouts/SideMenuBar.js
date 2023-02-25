@@ -2,27 +2,49 @@ import React, {useState} from 'react';
 import {Menu, Layout} from "antd";
 import {Link, NavLink} from "react-router-dom";
 import {
-    DashboardOutlined,
+    AntDesignOutlined,
+    DashboardOutlined, EditOutlined, FormOutlined, OrderedListOutlined,
 } from "@ant-design/icons";
 
 const { Sider } = Layout;
-const {Item, SubMenu} = Menu;
 
 const items = [
     {
         key: '/dashboard',
-        label:  <Link to='/dashboard'>Dashboard</Link>,
+        label:  <NavLink to='/dashboard'>Dashboard</NavLink>,
         icon: <DashboardOutlined />
     },
     {
-        key: '/post',
-        label:  'Post',
-        icon: <DashboardOutlined />,
+        key: 'category',
+        label:  'Category',
+        icon: <AntDesignOutlined />,
         children: [
             {
-                key: '/dashboard/post',
-                label:  <Link to='/dashboard/create-post'>Dashboard</Link>,
-                icon: <DashboardOutlined />,
+                key: '/dashboard/category-create',
+                label:  <NavLink to='/dashboard/category-create'>Create</NavLink>,
+                icon: <FormOutlined />,
+            },
+            {
+                key: '/dashboard/category-list',
+                label:  <NavLink to='/dashboard/category-list'>List</NavLink>,
+                icon: <OrderedListOutlined />,
+            }
+        ]
+    },
+    {
+        key: 'post',
+        label:  'Post',
+        icon: <AntDesignOutlined />,
+        children: [
+            {
+                key: '/dashboard/post-create',
+                label:  <NavLink to='/dashboard/post-create'>Create</NavLink>,
+                icon: <FormOutlined />,
+            },
+            {
+                key: '/dashboard/post-list',
+                label:  <NavLink to='/dashboard/post-list'>List</NavLink>,
+                icon: <OrderedListOutlined />,
             }
         ]
     }
@@ -32,21 +54,8 @@ const SideMenuBar = () => {
     const [collapsed, setCollapsed] = useState(false);
 
     return (
-        <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
-
-            <Menu theme="dark" defaultSelectedKeys={window.location.pathname} items={items} mode="inline" className='mt-2'>
-                {/*<Item key='/dashboard' icon={<DashboardOutlined />}>*/}
-                {/*    <NavLink to='/dashboard'>Dashboard</NavLink>*/}
-                {/*</Item>*/}
-                {/*<SubMenu icon={<DashboardOutlined />} key='/post' title='Post'>*/}
-                {/*    /!*<Item key='/' icon={<DashboardOutlined />}>*!/*/}
-                {/*    /!*    <NavLink to='/'>Dashboard</NavLink>*!/*/}
-                {/*    /!*</Item>*!/*/}
-                {/*    /!*<Item key='/create' icon={<DashboardOutlined />}>*!/*/}
-                {/*    /!*    <NavLink to='/post'>create</NavLink>*!/*/}
-                {/*    /!*</Item>*!/*/}
-                {/*</SubMenu>*/}
-            </Menu>
+        <Sider theme='light' collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
+            <Menu defaultSelectedKeys={window.location.pathname} items={items} mode="inline" className='mt-2'/>
         </Sider>
     );
 };

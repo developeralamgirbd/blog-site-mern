@@ -226,6 +226,7 @@ exports.postByID = async (_id)=>{
 							updateDate: "$updatedAt",
 							authorName: {$concat: ["$authorInfo.firstName", " ", '$authorInfo.lastName'] },
 							categoryName: {$first: "$categoryInfo.name"},
+							categoryID: 1
 						}
 					}
 				]

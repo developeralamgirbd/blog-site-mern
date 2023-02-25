@@ -14,6 +14,7 @@ const {showCategoriesService,
 exports.create = async (req, res)=>{
     try {
         const {name} = req.body;
+        const authorID = req.auth._id;
 
        const findCategory = await categoryFindByName(name.toLowerCase());
 
@@ -24,7 +25,7 @@ exports.create = async (req, res)=>{
            });
        }
 
-        const category = await categoryCreateService(name);
+        const category = await categoryCreateService(name, authorID);
         res.status(200).json({
             status: 'success',
             message: 'Successfully created category',
@@ -97,16 +98,17 @@ exports.updateCategory = async (req, res)=>{
     try {
 
         const _id = req.params.categoryID;
-        const categoryName = req.body.categoryName;
+        const name = req.body.name;
+        const authorID = req.auth._id;
 
-        if (categoryName === ''){
+        if (name === ''){
             return res.status(400).json({
                 status: 'fail',
                 error: 'Category name is required'
             });
         }
 
-        const result = await categoryUpdateService(_id, categoryName)
+        const result = await categoryUpdateService(_id, authorID, name)
 
         if (!result){
             return res.status(400).json({
@@ -141,7 +143,7 @@ exports.deleteCategory = async (req, res)=>{
         if(!isCategory[0]){
             return res.status(400).json({
                 status: 'fail',
-                message: 'Category not found',
+                error: 'Category not found',
             });
         }
 
@@ -150,7 +152,7 @@ exports.deleteCategory = async (req, res)=>{
         if (CheckAssociate[0]){
             return res.status(400).json({
                 status: 'fail',
-                message: 'Delete failed, Category associate with post'
+                error: 'Delete failed, Category associate with post'
             });
         }
 
@@ -166,7 +168,7 @@ exports.deleteCategory = async (req, res)=>{
         console.log(error);
         res.status(500).json({
             status: 'fail',
-            error: error.message
+            error: 'Server error occurred'
         });
     }
 }

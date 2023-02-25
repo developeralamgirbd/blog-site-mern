@@ -1,13 +1,6 @@
 const mongoose = require("mongoose");
-const PostModel = require('../models/postModel');
-const CategoryModel = require('../models/categoryModel');
 
 const {categoryFindByID, categoryFindByName} = require("../services/categoryService/categoryService");
-
-const {deleteService} = require("../services/common/deleteService");
-const {checkAssociateService} = require("../services/common/checkAssociateService");
-
-const {updateService} = require("../services/common/updateService");
 
 const {
     showAllPostService,
@@ -22,6 +15,7 @@ const {
 
 exports.create = async (req, res)=>{
     try {
+        console.log(req.body);
 
         const {title, description, categoryID, } = req.body;
 
@@ -322,7 +316,7 @@ exports.showSinglePost = async (req, res)=>{
 
         res.status(200).json({
             status: 'Success',
-            data: post
+            data: post[0].posts[0]
         })
 
     }catch (error) {

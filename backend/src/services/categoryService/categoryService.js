@@ -2,8 +2,8 @@ const Category = require('../../models/categoryModel');
 const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
 
-exports.categoryCreateService = async (name)=>{
-    const category = new Category({name});
+exports.categoryCreateService = async (name, authorID)=>{
+    const category = new Category({name, authorID});
     await category.save();
     return category;
 }
@@ -34,13 +34,14 @@ exports.categoryFindByID = async (_id)=>{
     ]);
 }
 
-exports.categoryUpdateService = async (_id, category)=>{
-    return Category.findByIdAndUpdate(_id, {name: category}, {runValidators: true, new: true});
+
+exports.categoryUpdateService = async (_id, authorID, name)=>{
+    return Category.updateOne({authorID:  ObjectId(authorID), _id: ObjectId(_id)}, {name}, {runValidators: true});
 }
 
 
 exports.categoryDeleteService = async (authorID, _id)=>{
-    return Category.remove({authorID:  ObjectId(authorID), _id: ObjectId(_id)});
+    return Category.deleteOne({authorID:  ObjectId(authorID), _id: ObjectId(_id)});
 }
 
 

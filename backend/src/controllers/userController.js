@@ -289,7 +289,7 @@ exports.profileUpdate = async (req, res)=>{
 		}
 
 		res.status(200).json({
-			status: 'Profile successfully updated',
+			message: 'Profile successfully updated',
 			data: User
 		})
 	}catch (error) {

@@ -22,13 +22,14 @@ const AdminMain = () => {
                     minHeight: '100vh',
                 }}
             >
-             <SideMenuBar/>
+             <SideMenuBar />
                 <Layout className="site-layout">
                     <AppHeader/>
                     <Content
                         style={{
                             margin: '0 16px',
                         }}
+
                     >
                         <Breadcrumb
                             style={{
@@ -38,15 +39,7 @@ const AdminMain = () => {
                             <Breadcrumb.Item>User</Breadcrumb.Item>
                             <Breadcrumb.Item>Bill</Breadcrumb.Item>
                         </Breadcrumb>
-                        <div
-                            style={{
-                                padding: 24,
-                                minHeight: 360,
-                                background: colorBgContainer,
-                            }}
-                        >
-                           <Outlet/>
-                        </div>
+                           <Outlet />
                     </Content>
                     <AppFooter/>
                 </Layout>

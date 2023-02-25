@@ -2,6 +2,8 @@ import React, {useState} from 'react';
 import {Avatar, Dropdown, Space, theme, Layout, Row, Col, Button} from "antd";
 import {DownOutlined, KeyOutlined, SmileOutlined, UploadOutlined, UserOutlined} from "@ant-design/icons";
 import {sessionRemove} from "../helpers/sessionHelper";
+import {useAuth} from "../context/AuthProvider";
+import {Link} from "react-router-dom";
 
 const {Header} = Layout;
 
@@ -13,18 +15,18 @@ const items = [
     {
         key: '1',
         label: (
-            <a target="_blank" rel="noopener noreferrer" href="https://www.antgroup.com">
+            <Link to='/dashboard/profile'>
                 Profile
-            </a>
+            </Link>
         ),
         icon: <UserOutlined />
     },
     {
         key: '2',
         label: (
-            <a target="_blank" rel="noopener noreferrer" href="https://www.aliyun.com">
+            <Link to='/dashboard/change-password'>
                Change Password
-            </a>
+            </Link>
         ),
         icon: <KeyOutlined rotate={-130} />
     },
@@ -44,6 +46,9 @@ const ColorList = ['#f56a00', '#7265e6', '#ffbf00', '#00a2ae'];
 const GapList = [4, 3, 2, 1];
 
 const AppHeader = () => {
+
+    const {auth} = useAuth();
+
     const [user, setUser] = useState(UserList[0]);
     const [color, setColor] = useState(ColorList[0]);
     const [gap, setGap] = useState(GapList[0]);
@@ -78,7 +83,7 @@ const AppHeader = () => {
                         >
                             <a onClick={(e) => e.preventDefault()}>
                                 <Space>
-                                    Hover me
+                                    {auth?.firstName}
                                     <DownOutlined />
                                 </Space>
                             </a>

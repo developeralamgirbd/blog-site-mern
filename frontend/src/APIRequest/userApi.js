@@ -1,6 +1,6 @@
 import axios from "axios";
 import toast from "react-hot-toast";
-import {setOtp, setVerifyEmail} from "../helpers/sessionHelper";
+import {setOtp} from "../helpers/sessionHelper";
 
 export const loginRequest = async (email, password)=>{
     try {
@@ -69,10 +69,60 @@ export const sendOtpRequest = async (email)=>{
     }
 }
 
+export const getProfileRequest = async ()=>{
+
+    try {
+        const {data} =  await axios.get(`/users`);
+        return data
+    }catch (e) {
+        if (e.response.status === 400){
+            toast.error(e.response.data.error)
+            return false
+        }else {
+            toast.error('Server error occurred')
+            return false
+        }
+    }
+}
+
 export const resetPasswordRequest = async (email, otp, password, confirmPassword)=>{
     try {
 
         const {data} =  await axios.patch(`/users/${email}/${otp}`, {password, confirmPassword});
+        toast.success(data.message)
+        return true
+    }catch (e) {
+        if (e.response.status === 400){
+            toast.error(e.response.data.error)
+            return false
+        }else {
+            toast.error('Server error occurred')
+            return false
+        }
+    }
+}
+
+export const updateProfileRequest = async (userData)=>{
+    try {
+
+        const {data} =  await axios.patch('/users/p', userData);
+        toast.success(data.message)
+        return true
+    }catch (e) {
+        if (e.response.status === 400){
+            toast.error(e.response.data.error)
+            return false
+        }else {
+            toast.error('Server error occurred')
+            return false
+        }
+    }
+}
+
+export const passwordChangeRequest = async (values)=>{
+    try {
+
+       const {data} = await axios.patch('/users', values);
         toast.success(data.message)
         return true
     }catch (e) {

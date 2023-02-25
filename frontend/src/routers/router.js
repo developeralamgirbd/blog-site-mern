@@ -9,6 +9,12 @@ import ForgotPasswordPage from "../pages/auth/ForgotPasswordPage";
 import VerifyOtpPage from "../pages/auth/VerifyOtpPage";
 import NewPasswordPage from "../pages/auth/NewPasswordPage";
 import PrivateRoute from "./privateRoute";
+import CategoryCreatePage from "../pages/category/CategoryCreatePage";
+import CategoryListPage from "../pages/category/CategoryListPage";
+import PostCreatePage from "../pages/post/PostCreatePage";
+import PostListPage from "../pages/post/PostListPage";
+import ProfilePage from "../pages/auth/ProfilePage";
+import UpdatePasswordPage from "../pages/auth/UpdatePasswordPage";
 
 const router = createBrowserRouter([
     {
@@ -18,6 +24,30 @@ const router = createBrowserRouter([
             {
                 path: '/dashboard',
                 element: <DashboardPage/>
+            },
+            {
+                path: '/dashboard/category-create',
+                element: <CategoryCreatePage/>
+            },
+            {
+                path: '/dashboard/category-list',
+                element: <CategoryListPage/>
+            },
+            {
+                path: '/dashboard/post-create',
+                element: <PostCreatePage/>
+            },
+            {
+                path: '/dashboard/post-list',
+                element: <PostListPage/>
+            },
+            {
+                path: '/dashboard/profile',
+                element: <ProfilePage/>
+            },
+            {
+                path: '/dashboard/change-password',
+                element: <UpdatePasswordPage/>
             },
         ]
     },
