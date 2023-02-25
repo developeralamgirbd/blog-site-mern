@@ -72,14 +72,14 @@ exports.verifyOTP=async (req,res)=>{
 	let statusUpdate=1;
 
 	// Create a new session
-	const session = await mongoose.startSession();
-	await session.startTransaction();
+/*	const session = await mongoose.startSession();
+	await session.startTransaction();*/
 
 	try {
 
 		// Without transaction
 
-		/*let OTPCount = await OtpModel.aggregate([
+		let OTPCount = await OtpModel.aggregate([
 			{$match: {email: email, otp: OTPCode, status: status}}, {$count: "total"}
 		])
 
@@ -89,20 +89,23 @@ exports.verifyOTP=async (req,res)=>{
 				email: email,
 				otp: OTPCode,
 				status: statusUpdate
-			}, {session})
+			})
 
 
-			await UserModel.updateOne({email}, {verified: true}, {session} );
+			await UserModel.updateOne({email}, {verified: true} );
 
 		} else {
 			res.status(400).json({
 				status: "fail",
 				error: "Invalid OTP Code"
 			})
-		}*/
+		}
+		res.status(200).json({
+			message: "OTP verify successfully",
+		})
 
 		// With Transaction
-		const options = { session };
+		/*const options = { session };
         const otp = await OtpModel.findOne({email, otp: OTPCode, status: status }, null, options);
 
 		if (!otp){
@@ -124,13 +127,13 @@ exports.verifyOTP=async (req,res)=>{
 
         res.status(200).json({
             message: "OTP verify successfully",
-        })
+        })*/
 
 	}
 	catch (err) {
-		await session.abortTransaction();
+	/*	await session.abortTransaction();
 		session.endSession();
-		console.error('Transaction aborted:', err);
+		console.error('Transaction aborted:', err);*/
 
 		res.status(500).json({
 			status: "fail",
