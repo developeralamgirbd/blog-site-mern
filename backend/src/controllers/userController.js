@@ -16,6 +16,15 @@ exports.register = async (req, res)=>{
 	try{
 		const email = req.body.email;
 
+		const isUserExit = await userFindByEmailService(email);
+
+		if (isUserExit[0]){
+			return res.status(400).json({
+				status: 'fail',
+				error: 'Email already taken'
+			})
+		}
+
 		const OtpCode = Math.floor(100000 + Math.random() * 900000);
 
 		const isExitEmail = await OtpModel.findOne({email})
@@ -98,7 +107,7 @@ exports.verifyOTP=async (req,res)=>{
 
 		if (!otp){
 			return res.status(400).json({
-				message: "Invalid OTP",
+				error: "Invalid OTP",
 			})
 		}
 
@@ -165,6 +174,7 @@ exports.sendOTP = async (req, res) => {
 		res.status(200).json({
 			status: "success",
 			message: 'OTP send successfully, please check your email',
+			otp: OtpCode
 		})
 
 	}catch (e) {
@@ -426,33 +436,8 @@ exports.resetPassword= async (req,res)=>{
 
 		res.status(200).json({
 			status: "success",
-			data: 'Password update successfully'
+			message: 'Password Reset successfully'
 		})
-
-		/*if (otp[0].status === 1) {
-			//
-			await UserModel.updateOne({email: email}, {
-				password: NewPass
-			});
-
-			// await OtpModel.updateOne({email: email, otp: OTPCode, status: 1}, {
-			// 	otp: '',
-			// })
-
-
-
-
-			res.status(200).json({
-				status: "success",
-				data: 'Password update successfully'
-			})
-
-		} else {
-			res.status(400).json({
-				status: "fail",
-				error: "Invalid Request"
-			})
-		}*/
 	}
 	catch (err) {
 		console.log(err)

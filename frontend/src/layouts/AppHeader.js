@@ -1,42 +1,42 @@
 import React, {useState} from 'react';
-import {Avatar, Dropdown, Space, theme, Layout, Row, Col} from "antd";
-import {DownOutlined, SmileOutlined} from "@ant-design/icons";
+import {Avatar, Dropdown, Space, theme, Layout, Row, Col, Button} from "antd";
+import {DownOutlined, KeyOutlined, SmileOutlined, UploadOutlined, UserOutlined} from "@ant-design/icons";
+import {sessionRemove} from "../helpers/sessionHelper";
 
 const {Header} = Layout;
+
+const logout = ()=>{
+    sessionRemove();
+}
 
 const items = [
     {
         key: '1',
         label: (
             <a target="_blank" rel="noopener noreferrer" href="https://www.antgroup.com">
-                1st menu item
+                Profile
             </a>
         ),
+        icon: <UserOutlined />
     },
     {
         key: '2',
         label: (
             <a target="_blank" rel="noopener noreferrer" href="https://www.aliyun.com">
-                2nd menu item (disabled)
+               Change Password
             </a>
         ),
-        icon: <SmileOutlined />,
-        disabled: true,
+        icon: <KeyOutlined rotate={-130} />
     },
     {
         key: '3',
         label: (
-            <a target="_blank" rel="noopener noreferrer" href="https://www.luohanacademy.com">
-                3rd menu item (disabled)
+            <a href='#' onClick={logout} >
+               Log Out
             </a>
         ),
-        disabled: true,
-    },
-    {
-        key: '4',
-        danger: true,
-        label: 'a danger item',
-    },
+        icon: <UploadOutlined rotate={90} />
+    }
 ];
 
 const UserList = ['U', 'Lucy', 'Tom', 'Edward'];

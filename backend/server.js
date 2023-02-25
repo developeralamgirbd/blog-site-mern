@@ -24,18 +24,21 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-// DB Connection
-mongoose
-		.connect(process.env.DATABASE)
-		.then(()=> console.log('DB Connected'))
-		.catch((err) => console.log(err));
+
 		
 		
 // Router
 readdirSync('./src/routes').map(r => app.use('/api/v1', require(`./src/routes/${r}`)));
 
-// Server Listen
 const port = process.env.PORT || 8000;
-app.listen(port, ()=>{
-	console.log(`Server run success on port ${port}`);
-})
+// DB Connection
+mongoose
+	.connect(process.env.DATABASE)
+	.then(()=> {
+		console.log('DB Connected')
+		// Server Listen
+		app.listen(port, ()=>{
+			console.log(`Server run success on port ${port}`);
+		})
+	})
+	.catch((err) => console.log(err));

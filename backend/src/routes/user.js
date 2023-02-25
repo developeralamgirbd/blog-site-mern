@@ -17,5 +17,10 @@ router.get('/users', AuthVerifyMiddleware, profile);
 router.patch('/users/p', AuthVerifyMiddleware, profileUpdate);
 router.patch('/users', AuthVerifyMiddleware, passwordUpdate);
 
+// Auth check route
+router.get('/auth-check', AuthVerifyMiddleware, (req, res)=>{
+    res.status(200).json({ok: true});
+});
+
 
 module.exports = router;

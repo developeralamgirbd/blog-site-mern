@@ -17,7 +17,7 @@ exports.userDetailsService = async (email)=>{
 
 
 exports.userFindByEmailService = async (email)=>{
-	return await User.aggregate(  [
+	return User.aggregate(  [
 		{$match: {email } }
 	] );
 };
