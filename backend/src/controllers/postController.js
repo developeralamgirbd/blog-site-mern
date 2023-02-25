@@ -77,13 +77,15 @@ exports.authShowAllPost = async (req, res)=>{
 
 exports.showAllPost = async (req, res)=>{
     try {
-
-        const post = await showAllPostService();
+        const perPage = 6;
+        const page = req.params?.page ? req.params?.page : 1;
+        const query = {};
+        const post = await showAllPostService(query, page, perPage);
 
         if (!post[0]){
             return res.status(400).json({
                 status: 'fail',
-                message: 'Post not found'
+                error: 'Post not found'
             });
         }
 
@@ -192,18 +194,13 @@ exports.authSearchPosts = async (req, res)=>{
 exports.searchPosts = async (req, res)=>{
     try {
 
-        const keyword = req.params.keyword;
+        const keyword = req.params?.keyword;
+        const perPage = 6;
+        const page = req.params?.page ? req.params?.page : 1;
 
         const searchQuery = { title: {$regex: keyword, $options: "i" }};
 
-        const posts = await searchPostService(searchQuery)
-
-        if (posts[0].posts.length === 0){
-            return res.status(400).json({
-                status: 'fail',
-                message: 'Post not found'
-            });
-        }
+        const posts = await showAllPostService(searchQuery, page, perPage)
 
         res.status(200).json({
             status: 'Success',
@@ -262,7 +259,8 @@ exports.authShowPostByCategory = async (req, res)=>{
 
 exports.showPostByCategory = async (req, res)=>{
     try {
-
+        const perPage = 6;
+        const page = req.params?.page ? req.params?.page : 1;
         const categoryName =  req.params.name.toLowerCase();
 
         const isCategory = await categoryFindByName(categoryName);
@@ -270,20 +268,14 @@ exports.showPostByCategory = async (req, res)=>{
         if (!isCategory[0]){
             return res.status(400).json({
                 status: 'fail',
-                message: 'Category not found'
+                error: 'Category not found'
             });
         }
         const ObjectId = mongoose.Types.ObjectId;
         const query = {categoryID: ObjectId(isCategory[0]['_id'])}
 
-        const post = await showPostByCategoryService(query);
-
-        if (!post[0].posts[0]){
-            return res.status(400).json({
-                status: 'fail',
-                message: 'Post not found'
-            });
-        }
+        // const post = await showPostByCategoryService(query);
+        const post = await showAllPostService(query, page, perPage);
 
         res.status(200).json({
             status: 'Success',

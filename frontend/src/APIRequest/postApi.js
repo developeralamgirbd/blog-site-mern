@@ -39,9 +39,9 @@ export const getSinglePostRequest = async (id)=>{
     }
 }
 
-export const getPostsRequest = async ()=>{
+export const getPostsRequest = async (page)=>{
     try {
-        const {data} = await axios.get('/posts');
+        const {data} = await axios.get(`/posts/show/${page}`);
         return data
 
     }catch (e) {
@@ -50,6 +50,28 @@ export const getPostsRequest = async ()=>{
         }else {
             toast.error('Server error occurred')
         }
+    }
+}
+
+export const getPostsByCategoryRequest = async (name, page)=>{
+    try {
+        const {data} = await axios.get(`/posts/category/${name}/${page}`);
+        return data
+
+    }catch (e) {
+        if (e.response.status === 400){
+            // toast.error(e.response.data.error)
+        }else {
+            toast.error('Server error occurred')
+        }
+    }
+}
+export const getPostsByKeywordRequest = async (keyword, page)=>{
+    try {
+        const {data} = await axios.get(`/posts/search/${keyword}/${page}`);
+        return data
+    }catch (e) {
+
     }
 }
 

@@ -15,6 +15,9 @@ import PostCreatePage from "../pages/post/PostCreatePage";
 import PostListPage from "../pages/post/PostListPage";
 import ProfilePage from "../pages/auth/ProfilePage";
 import UpdatePasswordPage from "../pages/auth/UpdatePasswordPage";
+import SinglePost from "../pages/SinglePost";
+import PostsByCategory from "../pages/PostsByCategory";
+import PostsBySearch from "../pages/PostsBySearch";
 
 const router = createBrowserRouter([
     {
@@ -78,7 +81,20 @@ const router = createBrowserRouter([
             {
                 path: '/reset-password',
                 element: <NewPasswordPage/>
-            }
+            },
+            {
+                path: '/post/:id',
+                element: <SinglePost/>
+            },
+            {
+                path: '/category/posts/:name',
+                element: <PostsByCategory/>
+            },
+            {
+                path: '/search',
+                element: <PostsBySearch/>
+            },
+
         ]
     },
 

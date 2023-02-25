@@ -54,9 +54,10 @@ exports.authShowAllPostService = async (authorID)=>{
 	])
 }
 
-exports.showAllPostService = async ()=>{
+exports.showAllPostService = async (query, page, perPage)=>{
+
 	return Post.aggregate([
-		{$match: { }},
+		{$match: query},
 
 		{$lookup: {
 				from: 'users',
@@ -92,7 +93,8 @@ exports.showAllPostService = async ()=>{
 							categoryName: {$first: "$categoryInfo.name"},
 						}
 					},
-					{$limit: 12},
+					{$skip: (page - 1) * perPage},
+					{$limit: perPage},
 					{$sort: {createDate: -1}}
 				]
 			}},
