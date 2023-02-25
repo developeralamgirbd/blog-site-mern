@@ -1,5 +1,6 @@
 const User = require('../../models/userModel');
-
+const mongoose = require("mongoose");
+const ObjectId = mongoose.Types.ObjectId;
 exports.registerService = async(userData)=>{
 
 	const user = new User(userData);
@@ -10,7 +11,7 @@ exports.registerService = async(userData)=>{
 exports.userDetailsService = async (email)=>{
 	return await User.aggregate(  [
 		{$match: {email } },
-		{$project: {_id:0, password: 0, confirmationToken: 0, confirmationTokenExpire:0,createdAt:0, updatedAt: 0, passwordChangedAt: 0, passwordResetToken: 0, passwordResetExpires: 0}}
+		{$project: {password: 0, confirmationToken: 0, confirmationTokenExpire:0, passwordChangedAt: 0, passwordResetToken: 0, passwordResetExpires: 0}}
 	] );
 };
 
@@ -36,11 +37,10 @@ exports.passwordUpdateService = async (email, hashPassword)=>{
 }
 
 exports.userProfileUpdateService = async (_id, firstName, lastName)=>{
-	 const user = await User.updateOne({_id}, {$set: {
+	 return User.updateOne({_id: ObjectId(_id)}, {$set: {
 			 firstName,
 			 lastName,
 		 }}, {runValidators: true});
-	return user;
 }
 
 

@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {Button, Card, Form, Input} from "antd";
 import {getProfileRequest, updateProfileRequest} from "../../APIRequest/userApi";
+import {sessionSetAuth} from "../../helpers/sessionHelper";
 
 const ProfileForm = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -28,7 +29,10 @@ const ProfileForm = () => {
         updateProfileRequest(values).then(result => {
             setIsSubmitting(false)
             if (result){
-                getProfile();
+                getProfileRequest().then(res => {
+                    sessionSetAuth(res.data)
+                })
+
             }
         })
     };
