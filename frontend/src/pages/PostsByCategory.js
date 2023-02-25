@@ -44,9 +44,9 @@ const PostsByCategory = () => {
     }, [page])
 
     useEffect(()=> {
+        document.title = params.name
         loadPosts().catch(e => console.log(e));
     }, [params.name])
-
 
     return (
         <>

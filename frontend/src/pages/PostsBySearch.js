@@ -31,9 +31,14 @@ const PostsBySearch = () => {
         loadMore().catch()
     }, [page])
 
+    useEffect(()=>{
+        document.title = keyword
+    },[keyword])
+
 
     return (
         <>
+            <h3>Search by - {keyword}</h3>
             {
                 posts?.length > 0 ?
                     <Row gutter={16}>

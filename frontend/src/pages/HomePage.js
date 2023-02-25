@@ -42,12 +42,10 @@ const HomePage = () => {
     }, [page])
 
     useEffect(()=> {
+        document.title = 'Home'
         loadPosts().catch(e => console.log(e));
-        // getTotal().catch(e => console.log(e));
     }, [])
 
-    console.log(page)
-    console.log(posts)
 
     return (
         <>

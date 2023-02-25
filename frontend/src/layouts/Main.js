@@ -40,12 +40,6 @@ const Main = () => {
                                </li>
 
                            </ul>
-
-                           {/*<form className="d-flex" role="search">*/}
-                           {/*    <input className="form-control me-2" type="search" placeholder="Search"*/}
-                           {/*           aria-label="Search"/>*/}
-                           {/*        <button className="btn btn-outline-success" type="submit">Search</button>*/}
-                           {/*</form>*/}
                            <Search/>
 
                        </div>
@@ -62,7 +56,7 @@ const Main = () => {
                                     <li className="" >
                                         <Link to= {`/category/posts/${category.name}`}>
                                             {category.name}
-                                            <Badge count={0} offset={[4]} showZero/>
+                                            {/*<Badge count={0} offset={[4]} showZero/>*/}
                                         </Link>
                                     </li>
                                 ))
